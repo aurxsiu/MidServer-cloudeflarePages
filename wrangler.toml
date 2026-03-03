@@ -1,0 +1,11 @@
+name = "mid-server"
+compatibility_date = "2025-01-01"
+
+# Cloudflare Pages 项目会读取此文件来做 KV 绑定
+# 你需要在 Cloudflare Dashboard 创建一个 KV Namespace，
+# 然后把它的 id 填到下面。
+
+[[kv_namespaces]]
+binding = "MID_KV"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
