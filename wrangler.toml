@@ -1,5 +1,6 @@
 name = "mid-server"
 compatibility_date = "2025-01-01"
+main = "src/index.ts"
 
 # Cloudflare Pages 项目会读取此文件来做 KV 绑定
 # 你需要在 Cloudflare Dashboard 创建一个 KV Namespace，

@@ -4,6 +4,7 @@
 
 ### 端点
 
+- **GET/POST** `/rpc`：A -> **单次请求等待结果**（不轮询）。成功返回 `200` + 二进制响应体；超时返回 `504`（默认等待 25s，可用 `wait_ms` 调整，最高 29s）
 - **POST** `/send`：A -> 写入请求体，返回 `{ seq }`。如果忙返回 `409`
 - **GET** `/poll`：B -> 拉取待处理请求体（返回二进制），并在 header 返回 `X-Seq`
 - **POST** `/reply?seq=...`：B -> 回传响应体（任意二进制）
@@ -19,6 +20,13 @@
 3. 在 Cloudflare Pages 新建项目并部署本仓库（Functions 会自动生效）。
    - **Build command**：留空（或 `npm run build`，本项目不需要构建）
    - **Build output directory**：`public`
+
+> 你贴的日志里出现了 `Executing user deploy command: npx wrangler deploy`，这说明你在 Cloudflare 后台配置了“Deploy command”（或创建成了 Workers 项目）。
+> **Pages 正常不需要也不应该运行 `wrangler deploy`**，请把 deploy command 清空，让 Pages 自己发布。
+
+### 如果你当前后台强制跑的是 `npx wrangler deploy`
+
+我已经在 `wrangler.toml` 加了 `main = "src/index.ts"`，并提供了 `src/index.ts`，这样即使后台仍然跑 `wrangler deploy` 也不会再报 “Missing entry-point”。
 
 ### 本地开发（可选）
 
@@ -36,29 +44,13 @@ npm run dev
 ```bash
 BASE="https://YOUR-PAGES-DOMAIN"
 
-# 发送请求体（示例：文本）
+# 方式 1：POST（推荐，可传任意二进制）
 echo -n "hello from A" > request.bin
-RESP=$(curl -s -X POST "$BASE/send" --data-binary @request.bin)
-echo "$RESP"
+curl -s -o result.bin -X POST "$BASE/rpc?wait_ms=25000" --data-binary @request.bin
+echo "Got response -> result.bin"
 
-# 提取 seq（如果你没有 jq，就用这种简单方式）
-SEQ=$(echo "$RESP" | sed -E 's/.*"seq":([0-9]+).*/\1/')
-echo "SEQ=$SEQ"
-
-# 轮询结果
-while true; do
-  HTTP_STATUS=$(curl -s -o result.bin -w "%{http_code}" "$BASE/result?seq=$SEQ")
-  if [ "$HTTP_STATUS" = "200" ]; then
-    echo "Got response -> result.bin"
-    break
-  elif [ "$HTTP_STATUS" = "202" ]; then
-    sleep 1
-  else
-    echo "Error http=$HTTP_STATUS"
-    cat result.bin
-    break
-  fi
-done
+# 方式 2：GET（只适合文本；用 data= 传参）
+# curl -s -o result.bin "$BASE/rpc?data=hello%20from%20A&wait_ms=25000"
 ```
 
 ### Curl：电脑 B（轮询 + 回传）
