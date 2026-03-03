@@ -5,7 +5,7 @@ compatibility_date = "2025-01-01"
 # 你需要在 Cloudflare Dashboard 创建一个 KV Namespace，
 # 然后把它的 id 填到下面。
 
-[[MidServer-kv]]
+[[kv_namespaces]]
 binding = "MID_KV"
 id = "64e3cd6b5eb04cc0be5124753f89cc55"
 

@@ -15,8 +15,10 @@
 ### 部署到 Cloudflare Pages（必须）
 
 1. 在 Cloudflare Dashboard 创建一个 **KV Namespace**（Workers KV）。
-2. 打开本仓库的 `wrangler.toml`，把 `id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"` 替换为真实 ID。
+2. 打开本仓库的 `wrangler.toml`，确认 `[[kv_namespaces]]` 的 `id` 是你的 KV Namespace ID。
 3. 在 Cloudflare Pages 新建项目并部署本仓库（Functions 会自动生效）。
+   - **Build command**：留空（或 `npm run build`，本项目不需要构建）
+   - **Build output directory**：`public`
 
 ### 本地开发（可选）
 
