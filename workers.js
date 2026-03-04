@@ -1,11 +1,13 @@
-const html404 = `<!DOCTYPE html>
+var html404 = `<!DOCTYPE html>
 <body>
   <h1>Aurxsiu 404!</h1>
-</body>`;
+`;
 
 async function handleRequest(request) {
   const requestURL = new URL(request.url);
   const path = requestURL.pathname.split("/")[1];
+  console.log("path: " + path);
+  console.log("request: " + requestURL.pathname);
   if (!path) {
     //自定义页面
     const html = await fetch(
@@ -22,10 +24,13 @@ async function handleRequest(request) {
     if (value) {
       return new Response(value);
     }
-    return new Response(html404, {
-      headers: { "content-type": "text/html;charset=UTF-8" },
-      status: 404,
-    });
+    return new Response(
+      html404 + `<h2>` + requestURL.pathname + `</h2></body>`,
+      {
+        headers: { "content-type": "text/html;charset=UTF-8" },
+        status: 404,
+      },
+    );
   }
 }
 
